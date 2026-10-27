@@ -43,10 +43,6 @@ export async function getKegiatan(limit?: number): Promise<Kegiatan[]> {
   if (limit) q = q.limit(limit);
   return must(await q, 'kegiatan');
 }
-export async function getFooterLinks(): Promise<FooterLink[]> {
-  return must(await db.from('footer_link').select('*').order('urutan'), 'footer');
-}
-
 /** "Ahmad Fulan" -> "AF" (dipakai kalau foto belum diunggah) */
 export function inisial(nama: string): string {
   const kata = nama
