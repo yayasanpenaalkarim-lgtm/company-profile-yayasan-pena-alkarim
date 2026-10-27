@@ -1,0 +1,290 @@
+---
+import type { Settings } from '../lib/data';
+interface Props { s: Settings; }
+const { s } = Astro.props;
+const tahun = new Date().getFullYear();
+---
+
+{s.maps_embed_url && (
+  <iframe
+    class="maps"
+    title="Lokasi yayasan di Google Maps"
+    src={s.maps_embed_url}
+    loading="lazy"
+    referrerpolicy="no-referrer-when-downgrade"
+    allowfullscreen
+  ></iframe>
+)}
+
+<footer id="kontak" class="footer">
+  <div class="wrap footer-grid">
+    
+    <!-- Kolom 1: Identitas Singkat -->
+    <div class="f-col brand-col">
+      <div class="f-brand">
+        
+
+<span class:list={['brand-logo', s.logo_url && 'has-custom-logo']}>
+  {s.logo_url ? (
+    <img
+      src={s.logo_url}
+      alt={`Logo ${s.nama_yayasan}`}
+      class="site-logo-img"
+    />
+  ) : (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 3 1 8.5 12 14l8-4v6h2V8.5zM5 13.3V17c0 1.7 3.1 3 7 3s7-1.3 7-3v-3.7l-7 3.5z"/>
+    </svg>
+  )}
+</span>
+
+
+        <h3>{s.footer_nama}</h3>
+      </div>
+      <p>{s.footer_deskripsi}</p>
+    </div>
+
+    <!-- Kolom 2: Kontak Singkat (Dibuat menyambung tanpa <br/>) -->
+    <div class="f-col contact-col">
+      <h4>Hubungi Kami</h4>
+      <ul class="f-contact">
+        {s.alamat && <li><strong>Lokasi:</strong> {s.alamat}</li>}
+        {s.email1 && <li><strong>Email:</strong> {s.email1}</li>}
+        {(s.kontak1_wa || s.kontak2_wa) && (
+          <li style="display: flex; flex-direction: column; gap: 4px;">
+            <strong style="margin-bottom: 2px;">Layanan WA:</strong> 
+            {s.kontak1_wa && <span>{s.kontak1_nama ? `${s.kontak1_nama} : ` : ''}{s.kontak1_wa}</span>}
+            {s.kontak2_wa && <span>{s.kontak2_nama ? `${s.kontak2_nama} : ` : ''}{s.kontak2_wa}</span>}
+          </li>
+        )}
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="wrap">
+    <div class="f-bottom">
+      © {tahun} {s.footer_nama}. Hak cipta dilindungi.
+    </div>
+  </div>
+</footer>
+
+<style>
+  /* Peta Google Maps */
+  .maps {
+    width: 100%;
+    height: 350px;
+    border: none;
+    background: #eee;
+    display: block;
+  }
+
+  /* ==========================================
+     DESAIN FOOTER 2 KOLOM (LEBIH COMPACT/KECIL)
+     ========================================== */
+  .footer {
+    background-color: #F1F8F4;
+    border-top: 1px solid #e2e8f0;
+    padding: 40px 0 2px; /* Mengurangi ruang kosong di bagian atas/bawah */
+    color: #475569;
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Membagi menjadi 2 kolom rapi */
+    gap: 30px;
+    margin-bottom: 24px; /* Mengurangi jarak ke garis copyright */
+  }
+
+  /* Responsif: Jadikan 1 kolom saat dibuka di HP */
+  @media (max-width: 768px) {
+    .footer-grid {
+      grid-template-columns: 1fr;
+      
+    }
+  }
+
+  .f-col h4 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 12px;
+    margin-top: 0;
+  }
+
+  /* Kolom Identitas */
+  .f-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    color: #10b981;
+  }
+  
+  .brand-logo svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+  }
+  
+  .f-brand h3 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+  }
+  
+  .brand-col p {
+    line-height: 1.5;
+    font-size: 0.9rem;
+    margin: 0;
+    max-width: 450px;
+  }
+
+  /* List Kontak (Dirapatkan) */
+  .f-contact {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Jarak antar baris dibuat lebih rapat */
+  }
+
+  .f-contact li {
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+  
+  .f-contact strong {
+    color: #1e293b;
+    margin-right: 4px; /* Memberikan sedikit spasi setelah titik dua */
+  }
+
+  /* Bagian Bawah (Copyright) */
+  .f-bottom {
+    border-top: 1px solid #e2e8f0;
+    padding-top: 16px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #64748b;
+  }
+
+  
+/* ==========================================
+   FOOTER LEBIH RINGKAS UNTUK HP
+   ========================================== */
+@media screen and (max-width: 768px) {
+  /* Tinggi area Google Maps */
+  .maps {
+    height: 220px;
+    
+  }
+
+  /* Ruang footer diperkecil */
+  .footer {
+    padding: 24px 0 14px;
+  }
+
+  /* Susunan kolom dan jarak */
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    margin-bottom: 16px;
+  }
+
+  /* Identitas yayasan */
+  .f-brand {
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .f-brand h3 {
+    font-size: 1rem;
+    line-height: 1.35;
+  }
+
+  .brand-col p {
+    font-size: 0.82rem;
+    line-height: 1.5;
+  }
+
+  /* Judul kontak */
+  .f-col h4 {
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+  }
+
+  /* Informasi alamat, email, dan WhatsApp */
+  .f-contact {
+    gap: 6px;
+  }
+
+  .f-contact li {
+    font-size: 0.82rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  /* Bagian copyright */
+  .f-bottom {
+    padding-top: 12px;
+    font-size: 0.75rem;
+    line-height: 1.5;
+  }
+}
+
+/* HP dengan layar kecil */
+@media screen and (max-width: 400px) {
+  .maps {
+    height: 180px;
+  }
+
+  .footer {
+    padding: 20px 0 12px;
+  }
+
+  .footer-grid {
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+
+  .f-brand h3 {
+    font-size: 0.95rem;
+  }
+
+  .brand-col p,
+  .f-contact li {
+    font-size: 0.78rem;
+  }
+
+  .f-bottom {
+    font-size: 0.7rem;
+  }
+}
+/* ==========================================
+     BERSIHKAN BACKGROUND & KOTAK LOGO
+     ========================================== */
+  .brand-logo {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .site-logo-img {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    max-height: 42px; /* Atur tinggi logo agar pas di navbar */
+    width: auto;
+    object-fit: contain;
+    /* Trik ajaib untuk menghilangkan background putih pada file gambar */
+    mix-blend-mode: multiply; 
+  }
+</style>

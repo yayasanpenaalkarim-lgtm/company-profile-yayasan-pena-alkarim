@@ -1,0 +1,16 @@
+# Dependensi (Sistem Node.js)
+node_modules/
+
+# File sistem, cache, dan hasil build bawaan Astro
+.astro/
+dist/
+
+# File konfigurasi lingkungan (Rahasia)
+.env
+.env.*
+.env.example
+
+# Log error dan file sistem bawaan OS
+npm-debug.log*
+.DS_Store
+Thumbs.db

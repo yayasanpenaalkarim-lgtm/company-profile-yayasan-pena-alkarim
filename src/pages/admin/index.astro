@@ -1,0 +1,30 @@
+---
+import '../../styles/global.css';
+import '../../styles/admin.css';
+
+// Halaman ini statis; semua logika jalan di browser (src/scripts/admin.ts).
+// Keamanan sebenarnya ada di Supabase (login + RLS), bukan di halaman ini.
+export const prerender = true;
+---
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Admin Panel</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  </head>
+  <body class="admin">
+    <div id="app"><p class="loading">Memuat…</p></div>
+    <dialog id="cfm"></dialog>
+    <div id="toasts" role="status" aria-live="polite"></div>
+    <noscript><p class="loading">Halaman admin butuh JavaScript.</p></noscript>
+    <script>
+      import '../../scripts/admin';
+    </script>
+  </body>
+</html>

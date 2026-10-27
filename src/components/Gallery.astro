@@ -1,0 +1,12 @@
+---
+import type { Kegiatan } from '../lib/data';
+interface Props { items: Kegiatan[]; bento?: boolean }
+const { items, bento = false } = Astro.props;
+---
+<div class={`gallery${bento ? ' bento' : ''}`}>
+  {items.map((k) => (
+    <figure class="g">
+      {k.foto_url && <img src={k.foto_url} alt={k.judul} loading="lazy" />}
+    </figure>
+  ))}
+</div>

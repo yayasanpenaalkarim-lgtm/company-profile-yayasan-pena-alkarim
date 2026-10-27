@@ -1,0 +1,954 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Gallery from '../components/Gallery.astro';
+import Icon from '../components/Icon.astro';
+import { getPrestasi } from '../lib/data';
+import {
+  getSettings,
+  getProgram,
+  getPoinMisi,
+  getKegiatan
+} from '../lib/data';
+
+const [s, program, poinMisi, kegiatan] = await Promise.all([
+  getSettings(),
+  getProgram(),
+  getPoinMisi(),
+  getKegiatan(),
+]);
+const prestasi = await getPrestasi();
+const ikonMisi = ['bulb', 'users', 'rocket', 'link', 'heart', 'shield'];
+const kegiatanAtas = kegiatan.slice(0, 2);
+const kegiatanGeser = kegiatan.slice(2);
+const heroHighlightWords = (
+  s.hero_highlight || 'Berprestasi\nBerakhlak Mulia\nBermanfaat'
+)
+  .split(/\r?\n/)
+  .map((word) => word.trim())
+  .filter(Boolean);
+---
+
+<Layout title={s.nama_yayasan} description={s.hero_deskripsi} s={s}>
+
+  <!-- HERO -->
+  <section class="hero" id="beranda">
+    <div class="wrap">
+
+      <!-- Teks Kiri -->
+      <div class="reveal">
+        {s.hero_badge && <span class="badge">{s.hero_badge}</span>}
+
+        <h1>
+          {s.hero_judul}
+          <br />
+          <span style="display: inline-flex; align-items: baseline;">
+            <span
+              class="hl typing-text"
+              data-words={JSON.stringify(heroHighlightWords)}
+            ></span>
+            <span class="cursor" style="margin-left: 4px;">|</span>
+          </span>
+        </h1>
+
+        <p class="lead">{s.hero_deskripsi}</p>
+
+        {s.hero_tombol_label && (
+          <a class="btn btn-primary" href="/#program">
+            {s.hero_tombol_label}
+          </a>
+        )}
+      </div>
+
+      <!-- Gambar Hero dengan Animasi Tukar Card -->
+      <div class="hero-art reveal">
+        <div
+          class="swap-stack"
+          id="hero-swap"
+          role="button"
+          tabindex="0"
+          aria-label="Klik untuk ganti foto"
+        >
+
+          <!-- Card Depan -->
+          <div class="swap-card is-front">
+            <div class="hero-photo">
+              {s.hero_foto_url && (
+                <img src={s.hero_foto_url} alt={s.nama_yayasan} />
+              )}
+            </div>
+          </div>
+
+          <!-- Card Belakang -->
+          <div class="swap-card is-back">
+            <div class="hero-photo">
+              {s.hero_foto2_url && (
+                <img
+                  src={s.hero_foto2_url}
+                  alt={`${s.nama_yayasan} 2`}
+                />
+              )}
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PROGRAM -->
+  <section class="section" id="program">
+    <div class="wrap">
+
+      <div class="sec-head reveal">
+        <h2>{s.program_judul}</h2>
+        <p>{s.program_deskripsi}</p>
+      </div>
+
+      <div class="grid-4">
+        {program.map((p) => (
+          <article class="prog reveal">
+            <div class="frame">
+              <div class="ph slider-container">
+
+                {/* Jika ada foto, tampilkan trek slider. Jika kosong, biarkan class .ph menampilkan kotak hijau bawaan. */}
+                {p.foto_urls && p.foto_urls.length > 0 && (
+                  <>
+                    <div class="slider-track">
+                      {p.foto_urls.map((imgUrl) => (
+                        <img src={imgUrl} alt="Program Yayasan" loading="lazy" />
+                      ))}
+                    </div>
+
+                    {/* Indikator titik dan tombol panah HANYA muncul jika foto lebih dari 1 */}
+                    {p.foto_urls.length > 1 && (
+  <>
+    <div class="slider-dots" aria-label="Pilih foto program">
+      {p.foto_urls.map((_, index) => (
+        <button
+          type="button"
+          class={`dot ${index === 0 ? 'active' : ''}`}
+          aria-label={`Lihat foto ${index + 1}`}
+          aria-current={index === 0 ? 'true' : 'false'}
+        ></button>
+      ))}
+    </div>
+
+    <button
+      type="button"
+      class="slide-btn prev-btn"
+      aria-label="Foto sebelumnya"
+    >
+      &#10094;
+    </button>
+
+    <button
+      type="button"
+      class="slide-btn next-btn"
+      aria-label="Foto berikutnya"
+    >
+      &#10095;
+    </button>
+  </>
+)}
+                  </>
+                )}
+
+              </div>
+            </div>
+            <p>{p.deskripsi}</p>
+          </article>
+        ))}
+      </div>
+
+    </div>
+  </section>
+
+  <!-- VISI DAN MISI -->
+  <section class="section alt" id="visi-misi">
+    <div class="wrap profil">
+
+      <div class="reveal">
+        <h2 class="h2">{s.profil_judul}</h2>
+        <p class="lead">{s.profil_deskripsi}</p>
+
+        <div class="stack">
+          <div class="vm">
+            <span class="dot"><Icon name="check" /></span>
+            <div>
+              <h3>Visi</h3>
+              <p>{s.visi}</p>
+            </div>
+          </div>
+
+          <div class="vm">
+            <span class="dot"><Icon name="target" /></span>
+            <div>
+              <h3>Misi</h3>
+              <p>{s.misi}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="misi-grid">
+        {poinMisi.map((m, i) => (
+          <div class="pm reveal">
+            <span class={`ic s${i % 3}`}>
+              <Icon name={ikonMisi[i % ikonMisi.length]} />
+            </span>
+            <p>{m.deskripsi}</p>
+          </div>
+        ))}
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PRESTASI DAN GALERI -->
+  <section class="section" id="prestasi">
+    <div class="wrap">
+
+      <!-- Prestasi dan Capaian -->
+      <div class="sec-head reveal">
+        <h2>Prestasi dan Capaian</h2>
+        <p>
+          Bentuk dedikasi dan pencapaian kami dalam membangun generasi
+          yang lebih baik.
+        </p>
+      </div>
+
+      <div class="prestasi-list reveal">
+
+        {/* Melakukan perulangan data dari database */}
+        {prestasi.map((p) => (
+          <div class="p-item">
+            <div class="p-icon">
+              <svg viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="7"></circle>
+                <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+              </svg>
+            </div>
+            {/* Teks diambil secara dinamis dari kolom deskripsi di database */}
+            <p>{p.deskripsi}</p>
+          </div>
+        ))}
+
+      </div>
+
+      <!-- Galeri Foto -->
+      <div class="head-row reveal" style="margin-top: 80px;">
+        <h2 class="h2">{s.galeri_judul}</h2>
+        <a class="link-more" href="/galeri">Lihat semua foto →</a>
+      </div>
+
+      <div class="home-gallery reveal">
+  {kegiatan.length ? (
+    <>
+      <!-- Dua foto bagian atas -->
+      <div class="home-gallery-top">
+        {kegiatanAtas.map((item, index) => (
+          <figure class="home-gallery-photo">
+            <img
+              src={item.foto_url}
+              alt={item.judul || `Foto kegiatan ${index + 1}`}
+              loading="lazy"
+            />
+          </figure>
+        ))}
+      </div>
+
+      <!-- Foto bagian bawah yang bisa digeser -->
+      {kegiatanGeser.length > 0 && (
+        <div class="home-gallery-slider">
+          <button
+            type="button"
+            class="home-gallery-arrow prev"
+            data-gallery-prev
+            aria-label="Foto sebelumnya"
+          >
+            &#10094;
+          </button>
+
+          <div class="home-gallery-track">
+            {kegiatanGeser.map((item, index) => (
+              <figure class="home-gallery-slide">
+                <img
+                  src={item.foto_url}
+                  alt={item.judul || `Foto kegiatan ${index + 3}`}
+                  loading="lazy"
+                />
+              </figure>
+            ))}
+          </div>
+
+          <button
+            type="button"
+            class="home-gallery-arrow next"
+            data-gallery-next
+            aria-label="Foto berikutnya"
+          >
+            &#10095;
+          </button>
+        </div>
+      )}
+    </>
+  ) : (
+    <p class="empty">Belum ada foto.</p>
+  )}
+</div>
+
+    </div>
+  </section>
+
+</Layout>
+
+<style>
+  /* ==========================================
+     1. EFEK KURSOR BERKEDIP
+     ========================================== */
+  .cursor {
+    display: inline-block;
+    color: #059669;
+    font-weight: bold;
+    animation: blink 0.8s infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* ==========================================
+     2. CARD HERO
+     ========================================== */
+  .hero-art {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  .swap-stack {
+    position: relative;
+    width: 100%;
+    height: 340px;
+    cursor: pointer;
+  }
+
+  .swap-card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    border-radius: 28px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    transition: box-shadow 0.4s ease;
+  }
+
+  /* Card Depan */
+  .swap-card.is-front {
+    z-index: 2;
+    background-color: #ffffff;
+    box-shadow:
+      0 25px 50px -12px rgba(0, 0, 0, 0.15),
+      0 0 20px rgba(11, 107, 53, 0.05);
+    transform: translate(0, 0) rotate(0deg);
+  }
+
+  /* Card Belakang */
+  .swap-card.is-back {
+    z-index: 1;
+    background-color: #0b6b35;
+    box-shadow: none;
+    transform: translate(26px, 22px) rotate(5deg);
+  }
+
+  /* Gambar Card */
+  .hero-photo {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: inherit;
+  }
+
+  .hero-photo img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+  }
+
+  /* Sembunyikan gambar belakang */
+  .swap-card.is-back .hero-photo {
+    opacity: 0;
+  }
+
+  /* Efek Hover */
+  .swap-stack:hover .swap-card.is-front {
+    box-shadow:
+      0 30px 60px -15px rgba(0, 0, 0, 0.25),
+      0 0 25px rgba(11, 107, 53, 0.15);
+  }
+
+  /* ==========================================
+     3. RESPONSIVE CARD HERO UNTUK HP
+     ========================================== */
+  @media screen and (max-width: 768px) {
+    .hero-art {
+      width: calc(100% - 16px);
+      max-width: 340px;
+      margin: 0 auto;
+    }
+
+    .swap-stack {
+      height: clamp(190px, 58vw, 250px);
+    }
+
+    .swap-card {
+      border-radius: 20px;
+    }
+
+    .hero-photo,
+    .hero-photo img {
+      border-radius: 20px;
+    }
+
+    .swap-card.is-back {
+      transform: translate(14px, 12px) rotate(4deg);
+    }
+  }
+
+  /* HP dengan layar kecil */
+  @media screen and (max-width: 400px) {
+    .hero-art {
+      max-width: 290px;
+    }
+
+    .swap-stack {
+      height: clamp(180px, 56vw, 220px);
+    }
+  }
+
+  /* ==========================================
+     5. PRESTASI DAN CAPAIAN
+     ========================================== */
+  .prestasi-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+  }
+
+  .p-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #ffffff;
+    padding: 16px 24px;
+    border-radius: 20px;
+    border: 1px solid #f3f4f6;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .p-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 25px rgba(16, 185, 129, 0.1);
+  }
+
+  .p-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    background: #ecfdf5;
+    color: #10b981;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .p-icon :global(svg) {
+    width: 22px;
+    height: 22px;
+  }
+
+  .p-item p {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #374151;
+    line-height: 1.4;
+  }
+
+</style>
+
+<script>
+  // ==========================================
+  // SCRIPT 1: ANIMASI MENGETIK
+  // ==========================================
+  const typingElement = document.querySelector('.typing-text') as HTMLElement;
+
+  if (typingElement) {
+    const rawWords = typingElement.getAttribute('data-words') || '[]';
+    const words = JSON.parse(rawWords);
+
+    let wordIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
+
+    function typeEffect() {
+      const currentWord = words[wordIndex];
+
+      if (isDeleting) {
+        typingElement.textContent =
+          currentWord.substring(0, charIndex - 1);
+        charIndex--;
+      } else {
+        typingElement.textContent =
+          currentWord.substring(0, charIndex + 1);
+        charIndex++;
+      }
+
+      let typeSpeed = isDeleting ? 50 : 100;
+
+      if (!isDeleting && charIndex === currentWord.length) {
+        typeSpeed = 2000;
+        isDeleting = true;
+      } else if (isDeleting && charIndex === 0) {
+        isDeleting = false;
+        wordIndex = (wordIndex + 1) % words.length;
+        typeSpeed = 500;
+      }
+
+      setTimeout(typeEffect, typeSpeed);
+    }
+
+    if (words.length > 0) typeEffect();
+  }
+
+  // ==========================================
+  // SCRIPT 2: ANIMASI SWAP CARD
+  // RESPONSIF UNTUK HP DAN DESKTOP
+  // ==========================================
+  const stack = document.getElementById('hero-swap');
+
+  if (stack) {
+    const REST = 'translate(0px, 0px) rotate(0deg)';
+    const AWAY = 'translate(-10%, -14%) rotate(-8deg)';
+
+    const isMobile = window.matchMedia(
+      '(max-width: 768px)'
+    ).matches;
+
+    // Posisi card belakang
+    const BACK = isMobile
+      ? 'translate(14px, 12px) rotate(4deg)'
+      : 'translate(26px, 22px) rotate(5deg)';
+
+    // Jarak dorongan saat animasi berlangsung
+    const PUSH = isMobile
+      ? 'translate(24px, 18px) rotate(6deg)'
+      : 'translate(40px, 30px) rotate(8deg)';
+
+    const SHADOW = '0 25px 50px -12px rgba(0, 0, 0, 0.15)';
+    const NO_SHADOW = '0 0 0 rgba(0, 0, 0, 0)';
+    const EASE = 'cubic-bezier(0.45, 0, 0.2, 1)';
+    const DURATION = 800;
+
+    const look = {
+      front: {
+        backgroundColor: '#ffffff',
+        borderColor: 'rgba(255,255,255,0.5)',
+        boxShadow: SHADOW
+      },
+      back: {
+        backgroundColor: '#0b6b35',
+        borderColor: '#0b6b35',
+        boxShadow: NO_SHADOW
+      }
+    };
+
+    const reduceMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    );
+
+    let busy = false;
+
+    const run = (
+      el: HTMLElement,
+      frames: Keyframe[]
+    ): Animation =>
+      el.animate(frames, {
+        duration: DURATION,
+        easing: 'linear',
+        fill: 'forwards'
+      });
+
+    const swap = async (): Promise<void> => {
+      if (busy) return;
+
+      const front = stack.querySelector<HTMLElement>(
+        '.swap-card.is-front'
+      );
+
+      const back = stack.querySelector<HTMLElement>(
+        '.swap-card.is-back'
+      );
+
+      if (!front || !back) return;
+
+      busy = true;
+
+      const commit = (): void => {
+        front.classList.replace('is-front', 'is-back');
+        back.classList.replace('is-back', 'is-front');
+      };
+
+      if (reduceMotion.matches) {
+        commit();
+        busy = false;
+        return;
+      }
+
+      const frontPhoto = front.querySelector<HTMLElement>(
+        '.hero-photo'
+      );
+
+      const backPhoto = back.querySelector<HTMLElement>(
+        '.hero-photo'
+      );
+
+      const frontKF: Keyframe[] = [
+        {
+          offset: 0,
+          transform: REST,
+          zIndex: 2,
+          ...look.front,
+          easing: EASE
+        },
+        {
+          offset: 0.5,
+          transform: AWAY,
+          zIndex: 2,
+          ...look.front,
+          easing: EASE
+        },
+        {
+          offset: 0.51,
+          transform: AWAY,
+          zIndex: 1,
+          ...look.front,
+          easing: EASE
+        },
+        {
+          offset: 1,
+          transform: BACK,
+          zIndex: 1,
+          ...look.back
+        }
+      ];
+
+      const backKF: Keyframe[] = [
+        {
+          offset: 0,
+          transform: BACK,
+          zIndex: 1,
+          ...look.back,
+          easing: EASE
+        },
+        {
+          offset: 0.5,
+          transform: PUSH,
+          zIndex: 1,
+          ...look.back,
+          easing: EASE
+        },
+        {
+          offset: 0.51,
+          transform: PUSH,
+          zIndex: 2,
+          ...look.back,
+          easing: EASE
+        },
+        {
+          offset: 1,
+          transform: REST,
+          zIndex: 2,
+          ...look.front
+        }
+      ];
+
+      const anims: Animation[] = [
+        run(front, frontKF),
+        run(back, backKF)
+      ];
+
+      if (frontPhoto) {
+        anims.push(
+          run(frontPhoto, [
+            { offset: 0, opacity: 1 },
+            { offset: 0.5, opacity: 1, easing: EASE },
+            { offset: 1, opacity: 0 }
+          ])
+        );
+      }
+
+      if (backPhoto) {
+        anims.push(
+          run(backPhoto, [
+            { offset: 0, opacity: 0 },
+            { offset: 0.5, opacity: 0, easing: EASE },
+            { offset: 1, opacity: 1 }
+          ])
+        );
+      }
+
+      try {
+        await Promise.all(anims.map((animation) => animation.finished));
+        commit();
+      } catch {
+        // Abaikan jika animasi dibatalkan browser.
+      } finally {
+        anims.forEach((animation) => animation.cancel());
+        busy = false;
+      }
+    };
+
+    stack.addEventListener('click', () => {
+      void swap();
+    });
+
+    stack.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        void swap();
+      }
+    });
+  }
+</script>
+<script>
+  function initProgramSliders() {
+    document.querySelectorAll<HTMLElement>('.slider-container').forEach((container) => {
+      if (container.dataset.sliderReady === 'true') return;
+
+      const track = container.querySelector<HTMLElement>('.slider-track');
+      if (!track) return;
+
+      const slides = Array.from(
+        track.querySelectorAll<HTMLImageElement>('img')
+      );
+
+      const dots = Array.from(
+        container.querySelectorAll<HTMLButtonElement>('.dot')
+      );
+
+      const prevBtn = container.querySelector<HTMLButtonElement>('.prev-btn');
+      const nextBtn = container.querySelector<HTMLButtonElement>('.next-btn');
+
+      if (slides.length <= 1) return;
+
+      container.dataset.sliderReady = 'true';
+
+      const count = slides.length;
+      const reduceMotion = window.matchMedia(
+        '(prefers-reduced-motion: reduce)'
+      ).matches;
+
+      const transition = 'transform 680ms cubic-bezier(0.22, 1, 0.36, 1)';
+
+      // Salinan foto pertama dan terakhir untuk perpindahan melingkar.
+      const makeClone = (source: HTMLImageElement) => {
+        const clone = source.cloneNode(true) as HTMLImageElement;
+        clone.alt = '';
+        clone.setAttribute('aria-hidden', 'true');
+        return clone;
+      };
+
+      track.prepend(makeClone(slides[count - 1]));
+      track.append(makeClone(slides[0]));
+
+      let position = 1;
+      let current = 0;
+      let moving = false;
+      let timer: number | undefined;
+      let startX = 0;
+
+      const updateDots = () => {
+        dots.forEach((dot, index) => {
+          const active = index === current;
+          dot.classList.toggle('active', active);
+
+          if (active) {
+            dot.setAttribute('aria-current', 'true');
+          } else {
+            dot.removeAttribute('aria-current');
+          }
+        });
+      };
+
+      const updatePosition = (animated = true) => {
+        track.style.transition = animated && !reduceMotion
+          ? transition
+          : 'none';
+
+        track.style.transform = `translate3d(-${position * 100}%, 0, 0)`;
+
+        if (!animated || reduceMotion) {
+          moving = false;
+        }
+      };
+
+      const moveTo = (nextPosition: number, nextIndex: number) => {
+        if (moving || nextIndex === current) return;
+
+        position = nextPosition;
+        current = (nextIndex + count) % count;
+        moving = !reduceMotion;
+
+        updatePosition(true);
+        updateDots();
+      };
+
+      const next = () => {
+        if (!moving) {
+          moveTo(position + 1, current + 1);
+        }
+      };
+
+      const previous = () => {
+        if (!moving) {
+          moveTo(position - 1, current - 1);
+        }
+      };
+
+      const goTo = (target: number) => {
+        if (moving || target === current) return;
+
+        const forward = (target - current + count) % count;
+        const backward = (current - target + count) % count;
+
+        if (forward <= backward) {
+          moveTo(position + forward, target);
+        } else {
+          moveTo(position - backward, target);
+        }
+      };
+
+      // Setelah melewati salinan, kembali ke foto asli tanpa animasi.
+      track.addEventListener('transitionend', (event) => {
+        if (
+          event.target !== track ||
+          (event as TransitionEvent).propertyName !== 'transform'
+        ) {
+          return;
+        }
+
+        if (position === count + 1 || position === 0) {
+          track.style.transition = 'none';
+          position = position === 0 ? count : 1;
+          track.style.transform = `translate3d(-${position * 100}%, 0, 0)`;
+
+          // Memaksa browser menerapkan posisi sebelum transisi diaktifkan lagi.
+          void track.offsetHeight;
+          track.style.transition = transition;
+        }
+
+        moving = false;
+      });
+
+      prevBtn?.addEventListener('click', previous);
+      nextBtn?.addEventListener('click', next);
+
+      dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => goTo(index));
+      });
+
+      // Dukungan geser pada layar sentuh.
+      container.addEventListener('pointerdown', (event) => {
+        startX = event.clientX;
+      });
+
+      container.addEventListener('pointerup', (event) => {
+        const distance = event.clientX - startX;
+
+        if (Math.abs(distance) > 45) {
+          if (distance < 0) next();
+          else previous();
+
+          restartAuto();
+        }
+      });
+
+      // Autoplay berhenti saat kursor atau fokus berada di slider.
+      const stopAuto = () => {
+        if (timer !== undefined) {
+          window.clearInterval(timer);
+          timer = undefined;
+        }
+      };
+
+      const startAuto = () => {
+        stopAuto();
+
+        if (
+          reduceMotion ||
+          container.matches(':hover') ||
+          container.contains(document.activeElement)
+        ) {
+          return;
+        }
+
+        timer = window.setInterval(next, 4000);
+      };
+
+      function restartAuto() {
+        startAuto();
+      }
+
+      container.addEventListener('mouseenter', stopAuto);
+      container.addEventListener('mouseleave', startAuto);
+      container.addEventListener('focusin', stopAuto);
+      container.addEventListener('focusout', () => {
+        window.requestAnimationFrame(startAuto);
+      });
+
+      updatePosition(false);
+      updateDots();
+      startAuto();
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initProgramSliders, {
+      once: true,
+    });
+  } else {
+    initProgramSliders();
+  }
+</script>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.home-gallery-slider').forEach((slider) => {
+    const track = slider.querySelector<HTMLElement>('.home-gallery-track');
+    const prev = slider.querySelector<HTMLButtonElement>('[data-gallery-prev]');
+    const next = slider.querySelector<HTMLButtonElement>('[data-gallery-next]');
+
+    if (!track) return;
+
+    const geser = () => track.clientWidth * 0.85;
+
+    prev?.addEventListener('click', () => {
+      track.scrollBy({ left: -geser(), behavior: 'smooth' });
+    });
+
+    next?.addEventListener('click', () => {
+      track.scrollBy({ left: geser(), behavior: 'smooth' });
+    });
+  });
+</script>

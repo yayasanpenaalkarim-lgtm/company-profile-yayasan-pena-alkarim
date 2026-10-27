@@ -1,0 +1,83 @@
+
+---
+import '../styles/global.css';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import type { Settings } from '../lib/data';
+
+interface Props {
+  title: string;
+  description?: string;
+  s: Settings;
+}
+
+const { title, description = '', s } = Astro.props;
+
+// Halaman yang tidak menampilkan Google Maps dan Footer
+const pathname = Astro.url.pathname.replace(/\/+$/, '') || '/';
+
+const hideFooter =
+  pathname === '/galeri' ||
+  pathname === '/pengurus';
+
+// Cache 60 detik di CDN
+Astro.response.headers.set(
+  'Cache-Control',
+  'public, max-age=0, s-maxage=60, stale-while-revalidate=300'
+);
+---
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+
+    {s.hero_foto_url && (
+      <meta property="og:image" content={s.hero_foto_url} />
+    )}
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+    <!-- Navbar tetap tampil di semua halaman -->
+    <Navbar s={s} />
+
+    <main>
+      <slot />
+    </main>
+
+    <!-- Maps dan Footer disembunyikan pada halaman Galeri dan Pengurus -->
+    {!hideFooter && <Footer s={s} />}
+
+    <!-- MESIN ANIMASI SCROLL -->
+    <script>
+      const revealElements = document.querySelectorAll('.reveal');
+
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+          } else {
+            entry.target.classList.remove('active');
+          }
+        });
+      }, {
+        threshold: 0.15
+      });
+
+      revealElements.forEach(el => revealObserver.observe(el));
+    </script>
+  </body>
+</html>

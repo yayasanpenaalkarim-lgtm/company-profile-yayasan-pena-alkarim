@@ -1,0 +1,19 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Gallery from '../components/Gallery.astro';
+import { getSettings, getKegiatan } from '../lib/data';
+
+const [s, kegiatan] = await Promise.all([getSettings(), getKegiatan()]);
+---
+<Layout title={`${s.galeri_judul} | ${s.nama_yayasan}`} description={s.galeri_judul} s={s} active?="prestasi">
+  <div class="page-head">
+    <div class="wrap">
+      <h1>{s.galeri_judul}</h1>
+    </div>
+  </div>
+  <section class="section">
+    <div class="wrap">
+      {kegiatan.length ? <Gallery items={kegiatan} /> : <p class="empty">Belum ada foto.</p>}
+    </div>
+  </section>
+</Layout>

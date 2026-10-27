@@ -1,0 +1,15 @@
+---
+import { inisial, type Pengurus } from '../lib/data';
+interface Props { p: Pengurus; utama?: boolean }
+const { p, utama = false } = Astro.props;
+---
+<article class={`person${utama ? ' lead-person' : ''}`}>
+  <div class="pic">
+    {p.foto_url ? <img src={p.foto_url} alt={p.nama} loading="lazy" /> : <span>{inisial(p.nama)}</span>}
+  </div>
+  <div class="info">
+    <h3>{p.nama}</h3>
+    <div class="role">{p.jabatan}</div>
+    {p.deskripsi && <p>{p.deskripsi}</p>}
+  </div>
+</article>
