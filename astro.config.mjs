@@ -5,5 +5,7 @@ import vercel from '@astrojs/vercel';
 // Halaman /admin dibuat statis (prerender) dan jalan di browser.
 export default defineConfig({
   output: 'server',
+  compressHTML: true,
+  session: false,
   adapter: vercel(),
 });
