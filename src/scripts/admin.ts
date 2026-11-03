@@ -776,6 +776,8 @@ function renderLogin(error = ''): void {
 
                <button class="btn btn-primary btn-block btn-lg" type="submit">Masuk</button>
 
+               <a class="btn btn-ghost btn-block" href="/admin/reset-password">Lupa password?</a>
+
             </form>
 
          </section>
