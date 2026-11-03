@@ -1,0 +1,106 @@
+name: Supabase Database Backup
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: supabase-database-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Verify Docker
+        run: docker info > /dev/null
+
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y age rclone
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: 2.122.0
+
+      - name: Backup, encrypt and upload
+        shell: bash
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          BACKUP_AGE_RECIPIENT: ${{ secrets.BACKUP_AGE_RECIPIENT }}
+          RCLONE_CONFIG_B64: ${{ secrets.RCLONE_CONFIG_B64 }}
+        run: |
+          set +x
+          set -euo pipefail
+          umask 077
+
+          : "${SUPABASE_DB_URL:?Missing DB URL}"
+          : "${BACKUP_AGE_RECIPIENT:?Missing encryption recipient}"
+          : "${RCLONE_CONFIG_B64:?Missing Drive config}"
+
+          WORKDIR="$(mktemp -d)"
+          trap 'rm -rf "$WORKDIR"' EXIT
+          trap 'exit 130' INT
+          trap 'exit 143' TERM
+
+          # Never echo tool diagnostics: they can contain URLs, tokens or row data.
+          exec 3>&1
+          exec >"$WORKDIR/private.log" 2>&1
+          trap 'echo "Backup failed; private diagnostics discarded." >&3' ERR
+
+          mkdir -p "$WORKDIR/dump"
+          cd "$WORKDIR"
+
+          echo "Exporting database..."
+
+          supabase db dump \
+            --db-url "$SUPABASE_DB_URL" \
+            -f dump/roles.sql \
+            --role-only
+
+          supabase db dump \
+            --db-url "$SUPABASE_DB_URL" \
+            -f dump/schema.sql
+
+          supabase db dump \
+            --db-url "$SUPABASE_DB_URL" \
+            -f dump/data.sql \
+            --data-only \
+            --use-copy \
+            -x storage.buckets_vectors \
+            -x storage.vector_indexes
+
+          test -s dump/roles.sql
+          test -s dump/schema.sql
+          test -s dump/data.sql
+
+          sha256sum dump/*.sql > dump/SHA256SUMS
+
+          STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
+          FILE="supabase-${STAMP}-${GITHUB_RUN_ID}.tar.gz.age"
+
+          tar -czf - dump | \
+            age -r "$BACKUP_AGE_RECIPIENT" \
+            -o "$FILE"
+
+          printf '%s' "$RCLONE_CONFIG_B64" | \
+            base64 --decode > rclone.conf
+
+          rclone --config rclone.conf \
+            copy "$FILE" \
+            "gdrive:Yayasan-Backups/Supabase/"
+
+          rclone --config rclone.conf \
+            check . \
+            "gdrive:Yayasan-Backups/Supabase/" \
+            --include "$FILE" \
+            --one-way \
+            --download
+
+          echo "Encrypted database backup uploaded and verified." >&3
