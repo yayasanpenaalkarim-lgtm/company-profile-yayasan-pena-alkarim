@@ -2,9 +2,6 @@ name: Supabase Database Backup
 
 on:
   workflow_dispatch:
-  push:
-    branches: [feature/supabase-backup]
-    paths: [.github/workflows/supabase-backup.yml]
 
 permissions:
   contents: read
@@ -15,12 +12,6 @@ concurrency:
 
 jobs:
   backup:
-    if: >-
-      github.run_attempt == 1 &&
-      (github.event_name == 'workflow_dispatch' ||
-      (github.event_name == 'push' &&
-      github.ref == 'refs/heads/feature/supabase-backup' &&
-      github.event.head_commit.message == 'ci: one-time Supabase backup test [backup-test-565c42d]'))
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
