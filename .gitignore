@@ -10,7 +10,13 @@ dist/
 .env.*
 .env.example
 
+
+
+
 # Log error dan file sistem bawaan OS
 npm-debug.log*
 .DS_Store
 Thumbs.db
+# Metadata lokal Vercel dan Supabase CLI
+.vercel/
+supabase/.temp/
