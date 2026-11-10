@@ -14,7 +14,7 @@ const links = [
   { href: '/#kontak', label: 'Kontak', key: 'kontak' },
   { href: '/pengurus', label: 'Pengurus', key: 'pengurus' },
 ];
-const donasi = '/#kontak';
+const donasi = 'https://wa.me/6281807105976';
 ---
 
 {s.banner_teks && (
@@ -59,7 +59,7 @@ const donasi = '/#kontak';
 
     <div id="cta-desktop" class="nav-cta">
       <a class="btn btn-outline" href="/#kontak">Hubungi Kami</a>
-      <a class="btn btn-primary" href={donasi}>Donasi Sekarang</a>
+      <a class="btn btn-primary" href={donasi} target="_blank" rel="noopener noreferrer">Donasi Sekarang</a>
     </div>
 
     <!-- TOMBOL BURGER HP -->
@@ -83,7 +83,7 @@ const donasi = '/#kontak';
     </div>
     <div class="mobile-actions">
       <a class="btn btn-outline" href="/#kontak">Hubungi Kami</a>
-      <a class="btn btn-primary" href={donasi}>Donasi Sekarang</a>
+      <a class="btn btn-primary" href={donasi} target="_blank" rel="noopener noreferrer">Donasi Sekarang</a>
     </div>
   </div>
 </header>
